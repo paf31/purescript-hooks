@@ -1,0 +1,20 @@
+{
+  "name": "purescript-hooks",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "build": "spago bundle-app && browserify index.js > html/index.js"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "pscid": "^2.9.3",
+    "purescript": "^0.13.8",
+    "spago": "^0.18.1"
+  },
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
+}
