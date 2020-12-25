@@ -20,6 +20,26 @@ import Record (get, insert)
 
 import Unsafe.Coerce (unsafeCoerce)
 
+-- | A builder for a hooks-based UI component, containing two functions:
+-- |
+-- | - a function for building up the initial component state from a smaller
+-- |   initial state, and 
+-- | - a function to render the component from the new, final state.
+-- |
+-- | The `UI` type can be used with qualified do notation, using the functions
+-- | in this module to replace their usual monadic counterparts.
+-- | 
+-- | For example:
+-- |
+-- | ```purescript
+-- | import Hooks as hooks
+-- |
+-- | component = Hooks.do
+-- |   value <- useState (SProxy :: SProxy "value") ""
+-- |   completed <- useState (SProxy :: SProxy "completed") false
+-- |   ...
+-- | ```
+
 data UI i j a = UI (Record i -> Record j) (Record j -> a)
 
 pick :: forall a b c. Union a b c => Record c -> Record a
@@ -48,6 +68,7 @@ bind (UI ij ja) g = UI
 pure :: forall i a. a -> UI i i a
 pure a = UI identity \_ -> a
 
+-- | Create a new piece of state from a label and an initial value.
 useState 
   :: forall l i j a
    . IsSymbol l
@@ -58,6 +79,9 @@ useState
   -> UI i j a
 useState l a0 = UI (insert l a0) \r -> get l r
 
+-- | Turn a `UI` builder into an initial state and render function pair.
+-- | This function can be used to build simple UI components with other
+-- | frameworks.
 runUI
   :: forall s a
    . UI () s a
@@ -66,6 +90,11 @@ runUI
      }
 runUI (UI f g) = { initialState: f {}, render: g }
 
+-- | Turn a `UI` builder component into a React component, using the
+-- | react-basic-classic library. This function is provided as an example
+-- | of using this library to create real components. The general framework
+-- | can be used with any framework which supports components based on the
+-- | sort of data returned by the `runUI` function.
 make
   :: forall props s
    . Component props
@@ -78,8 +107,3 @@ make component ui =
         { initialState
         , render: \self@{ state } -> render state self 
         }
-   
-   
-   
-   
-   
